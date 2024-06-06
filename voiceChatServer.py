@@ -5,28 +5,42 @@ port = 5000
 host = "0.0.0.0"
 
 server = socket.socket()
-
 server.bind((host, port))
-
 server.listen(5)
 
-client = []
+clients = []
 
 def start():
-    while(True):
+    print("Server started, waiting for connections...")
+    while True:
         conn, addr = server.accept()
-        client.append(conn)
-        t = threading.Thread(target = send, args = (conn, ))
+        print(f"Client connected from {addr}")
+        clients.append(conn)
+        t = threading.Thread(target=handle_client, args=(conn,))
         t.start()
 
-def send(fromConnection):
+def handle_client(conn):
     try:
-        while(True):
-            data = fromConnection.recv(4096)
-            for cl in client:
-                if cl != fromConnection:
-                    cl.send(data)
-    except:
-        print("Client Disconnected")
+        while True:
+            data = conn.recv(4096)
+            if not data:
+                break
+            print(f"Received data from {conn.getpeername()}")
+            broadcast(data, conn)
+    except Exception as e:
+        print(f"Client handling error: {e}")
+    finally:
+        print(f"Client {conn.getpeername()} disconnected")
+        clients.remove(conn)
+        conn.close()
+
+def broadcast(data, from_conn):
+    for cl in clients:
+        if cl != from_conn:
+            try:
+                cl.send(data)
+                print("Broadcasted data")
+            except Exception as e:
+                print(f"Broadcast error: {e}")
 
 start()
