@@ -4,10 +4,15 @@ import pyaudio
 
 client = socket.socket()
 
-host = "3.111.198.149"
+#host = "3.111.198.149"
+host = "211.255.212.196"
 port = 5000
 
+own_value = "1000"
+pair_value = "1001"
+
 client.connect((host, port))
+client.send(f"{own_value},{pair_value}".encode())
 
 p = pyaudio.PyAudio()
 
@@ -25,7 +30,7 @@ input_stream = p.open(format=Format,
 output_stream = p.open(format=Format,
                        channels=Channels,
                        rate=Rate,
-                       output=True,
+                       output=True,               
                        frames_per_buffer=Chunks)
 
 def send():
