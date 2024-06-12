@@ -8,20 +8,21 @@ def log_message(message):
 client = socket.socket()
 
 host = "13.201.120.248"
-#host = "211.255.212.196"
 port = 5000
 
 # Hard-coded values
-own_value = "client2"
-pair_value = "client1"
+own_value = "client3"
+pair_value = "client4"
 
-try:
-    client.connect((host, port))
-    client.send(f"{own_value},{pair_value}".encode())
-    log_message("Connected to the server.")
-except Exception as e:
-    log_message(f"Failed to connect to the server: {e}")
-    exit(1)
+connected = False
+while not connected:
+    try:
+        client.connect((host, port))
+        client.send(f"{own_value},{pair_value}".encode())
+        log_message("Connected to the server.")
+        connected = True
+    except Exception as e:
+        log_message(f"Retrying to connect to the server: {e}")
 
 p = pyaudio.PyAudio()
 
@@ -61,7 +62,7 @@ def receive():
             data = client.recv(Chunks)
             output_stream.write(data)
         except Exception as e:
-            log_message(f"Error in receive thread: {e}")
+            log_value(f"Error in receive thread: {e}")
             break
 
 t1 = threading.Thread(target=send)
@@ -80,4 +81,4 @@ output_stream.close()
 p.terminate()
 client.close()
 
-log_message("Audio streams closed and client disconnected.")
+log_message("Audio streams closed and client disconnected.")
