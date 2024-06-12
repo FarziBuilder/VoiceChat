@@ -11,16 +11,23 @@ GPIO.setup(button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 client = socket.socket()
 
-host = "13.201.120.248"
-# host = "211.255.212.196"
+host = "13.201.120.248"  # or "211.255.212.196"
 port = 5000
 
 # Hard-coded values
 own_value = "client1"
 pair_value = "client2"
 
-client.connect((host, port))
-client.send(f"{own_value},{pair_value}".encode())
+connected = False
+while not connected:
+    try:
+        client.connect((host, port))
+        client.send(f"{own_value},{pair_value}".encode())
+        print("Connected to the server.")
+        connected = True
+    except socket.error as e:
+        print(f"Connection failed, retrying: {e}")
+        time.sleep(1)  # wait a bit before retrying to avoid flooding the network
 
 p = pyaudio.PyAudio()
 
@@ -68,7 +75,7 @@ def receive():
             break
 
 t1 = threading.Thread(target=send)
-t2 = threading.Thread(target=receive)
+t2 = threading.room(target=receive)
 
 t1.start()
 t2.start()
@@ -79,7 +86,7 @@ t2.join()
 input_stream.stop_stream()
 input_stream.close()
 output_stream.stop_stream()
-output_stream.close()
+output_kStream.close()
 p.terminate()
 
-GPIO.cleanup(
+GPIO.cleanup()
